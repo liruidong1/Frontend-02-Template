@@ -7,6 +7,6 @@ function encoding(s: string){
         for(let i = 0; i < array.length; i++){
             result[i] = array[i].charCodeAt(0);
         }
-        return array;
+        return result;
     }
 }

@@ -1,0 +1,12 @@
+<!--加法表达式-->
+<AddtiveExpression>::=<MultiplicativeExpression>|
+    <AddtiveExpression>"+"<MultiplicativeExpression>|
+        <AddtiveExpression>"-"<MultiplicativeExpression>
+
+<!--乘法表达式-->
+<MultiplicativeExpression>::=<BracketExpression>|
+    <MultiplicativeExpression>"*"<BracketExpression>|
+    <MultiplicativeExpression>"/"<BracketExpression>
+
+<!--括号表达式-->
+<BracketExpression>::="("<AddtiveExpression>")"| <Number>

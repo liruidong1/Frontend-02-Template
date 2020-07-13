@@ -12,8 +12,8 @@
 
 2. **new 表达式**
     * `new Foo`，new的不带括号调用；
-    * `new a()()`，括号1是跟着new一起运算；
-    * `new new a()`，括号跟着第二个`new`运算
+    * `new a()()`，**括号1**是跟着**new**一起运算；
+    * `new new a()`，**括号**跟着第二个**new**运算
     
 
 3. **call 表达式**
@@ -21,3 +21,6 @@
     * `foo()`，`super()`；
     * `foo()['b']`，`foo().b`，``` foo()`abc` ```，会将`member表达式`降级为`call表达式`
 
+4. **left handside & right handside**
+    
+    * `a.b = c`，` ~~a + b = c~~ `

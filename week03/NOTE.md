@@ -16,5 +16,8 @@
     * `new new a()`，括号跟着第二个`new`运算
     
 
-3. **call 表达式[^函数调用] **    
+3. **call 表达式**
+
+    * `foo()`，`super()`；
+    * `foo()['b']`，`foo().b`，``` foo()`abc` ```，会将`member表达式`降级为`call表达式`
 

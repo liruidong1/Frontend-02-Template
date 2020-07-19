@@ -23,7 +23,7 @@
 
 4. **Left Handside & Right handside**
     
-    * `a.b = c`，~~a + b = c~~，`a.b`是左表达式，`a + b`是有表达式不能放在等号左侧。
+    * `a.b = c`，~~a + b = c~~，`a.b`是左表达式，`a + b`是右表达式不能放在等号左侧。
     
 5. **Update**
     

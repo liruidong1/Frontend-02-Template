@@ -2,6 +2,7 @@ function utf8Encoding(s) {
     let arr = [];
     for (let i = 0; i < s.length; i++) {
         let code = s.charCodeAt(i);
+
         if (code < 0x80) {
             //一个字节存储一个
             arr.push(code);

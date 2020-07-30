@@ -8,7 +8,6 @@ http.createServer((request, response) => {
         body.push(chunk);
     }).on('end', () => {
         body = Buffer.concat(body).toString();
-        console.log("body:", body);
         response.writeHead(200, {
             'Content-type': 'text/html'
         });
@@ -16,11 +15,38 @@ http.createServer((request, response) => {
 <head>
     <meta charset="UTF-8"/>
     <title>Title</title>
+    <style>
+        div{
+            background-color: aqua;
+        }
+        
+        body .a {
+            max-width: 100px;
+        }
+        
+        .body .a {
+            max-width: 200px;
+        }
+        
+        div.a.b {
+            display: flex;
+        }
+        
+        
+        div#id.a.b{
+            display: inline-block;
+        }
+        
+        .a.b{
+            display: block;
+        }
+        
+    </style>
 </head>
-<body>
-    <div>
+<body class="body">
+    <div class="a b" id="id">
         ssss
-        <div>ddddd</div>
+        <div class="a">ddddd</div>
     </div>
 </body>
 </html>

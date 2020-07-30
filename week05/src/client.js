@@ -50,7 +50,6 @@ ${this.bodyText}`;
             }
 
             connection.on('data', data =>{
-                console.log(data.toString());
                 parser.receive(data.toString());
 
                 if(parser.isFinished) {
@@ -83,5 +82,5 @@ void async function () {
 
     let response = await request.send();
     let dom = HtmlParser.parserHTML(response.body);
-
+    console.log(dom);
 }();

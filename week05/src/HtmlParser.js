@@ -15,6 +15,7 @@ function addCSSRules(text) {
     rules.push(...ast.stylesheet.rules);
 }
 
+//计算元素的css规则
 function computeCss(element) {
     //复制并反转了stack
     let elements = stack.slice().reverse();
@@ -42,17 +43,28 @@ function computeCss(element) {
         matched = j >= selectorParts.length;
 
         if (matched) {
-            console.log("Element", element, "matched rule", rule);
+            let sp = specificity(rule.selectors[0]);
+            let computedStyle = element.computedStyle;
+            for(let declaration of rule.declarations) {
+                let {property, value} = declaration;
+                if(!computedStyle[property]) {
+                    computedStyle[property] = {};
+                }
+
+                if(!computedStyle[property].specificity || specificityCompare(computedStyle[property].specificity, sp) < 0) {
+                    computedStyle[property].value = value;
+                    computedStyle[property].specificity = sp;
+                }
+            }
         }
     }
 }
 
+//匹配元素的css规则
 function match(element, selector) {
     if (!selector || !element.attributes) {
         return false;
     }
-
-    let start = selector.charAt(0);
 
     let match = /(?<tagName>(\w+)?)(?<id>(#\w+)?)(?<classNames>(.[\w.]+)?)/;
 
@@ -87,6 +99,51 @@ function match(element, selector) {
     }
 
     return matched;
+}
+
+//计算选择器优先级
+function specificity(selector){
+    let p = [0,0,0,0];
+    let selectorParts = selector.split(' ');
+    let match = /(?<tagName>(\w+)?)(?<id>(#\w+)?)(?<classNames>(.[\w.]+)?)/;
+
+    for(let part of selectorParts) {
+        let matchResult =  part.match(match);
+
+        let {tagName, id, classNames} = matchResult.groups;
+
+        if(tagName) {
+            p[3] += 1;
+        }
+
+        if(id) {
+            p[1] += 1;
+        }
+
+        if(classNames) {
+            classNames = classNames.split('.').filter(val => !!val);
+            p[2] += classNames.length;
+        }
+    }
+
+    return p;
+}
+
+//选择器优先级比较
+function specificityCompare(sp1, sp2) {
+    if(sp1[0] - sp2[0]) {
+        return sp1[0] - sp2[0]
+    }
+
+    if(sp1[1] - sp2[1]) {
+        return sp1[1] - sp2[1]
+    }
+
+    if(sp1[2] - sp2[2]) {
+        return sp1[2] - sp2[2]
+    }
+
+    return sp1[3] - sp2[3]
 }
 
 
@@ -338,4 +395,6 @@ module.exports.parserHTML = function (html) {
         state = state(char);
     }
     state = state(EOF);
+
+    return root;
 }

@@ -7,7 +7,8 @@ class ResponseParser {
     headerValue = '';
     bodyParser = null;
 
-    constructor() {}
+    constructor() {
+    }
 
     get isFinished() {
         return this.bodyParser && this.bodyParser.isFinished;
@@ -25,16 +26,16 @@ class ResponseParser {
 
     receive(str) {
         this.state = this.buildStatusLine;
-        for(let position = 0; position < str.length; position++) {
+        for (let position = 0; position < str.length; position++) {
             let char = str.charAt(position);
             this.state = this.state(str.charAt(position));
         }
     }
 
-    buildStatusLine(char){
-        if(char === '\r') {
+    buildStatusLine(char) {
+        if (char === '\r') {
             return this.waitStatusLineEnd;
-        }else {
+        } else {
             this.statusLine += char;
             return this.buildStatusLine;
         }
@@ -49,58 +50,58 @@ class ResponseParser {
     }
 
     buildHeaderName(char) {
-        if(char === ':') {
+        if (char === ':') {
             return this.waitHeaderSpace;
-        }else if(char === '\r') {
+        } else if (char === '\r') {
             return this.headerBuildEnd;
-        }else {
+        } else {
             this.headerName += char;
             return this.buildHeaderName;
         }
     }
 
-    waitHeaderSpace(char){
-        if(char === ' ') {
+    waitHeaderSpace(char) {
+        if (char === ' ') {
             return this.buildHeaderValue;
-        }else {
+        } else {
             return this.buildHeaderValue;
         }
     }
 
-    buildHeaderValue(char){
-        if(char === '\r') {
+    buildHeaderValue(char) {
+        if (char === '\r') {
             this.headers[this.headerName] = this.headerValue;
             this.headerName = '';
             this.headerValue = '';
             return this.waitStatusLineEnd;
-        }else {
+        } else {
             this.headerValue += char;
             return this.buildHeaderValue;
         }
     }
 
-    waitHeaderLineEnd(char){
-        if(char === '\n') {
+    waitHeaderLineEnd(char) {
+        if (char === '\n') {
             return this.buildHeaderName;
-        }else {
+        } else {
             return this.waitHeaderLineEnd;
         }
     }
 
 
-    headerBuildEnd(char){
-        if(char === '\n') {
-            if(this.headers['Transfer-Encoding'] === 'chunked') {
+    headerBuildEnd(char) {
+        if (char === '\n') {
+            if (this.headers['Transfer-Encoding'] === 'chunked') {
                 this.bodyParser = new ChunkedBodyParser();
             }
             return this.buildBody;
-        }else {
+        } else {
             return this.headerBuildEnd;
         }
     }
 
-    buildBody(char){
-        if(this.bodyParser) {
+    buildBody(char) {
+        if (this.bodyParser) {
             this.bodyParser.parser(char);
         }
         return this.buildBody;

@@ -13,14 +13,14 @@ class Request {
         this.body = options.body || {};
         this.headers = options.headers || {};
 
-        if(!this.headers['Content-Type']) {
+        if (!this.headers['Content-Type']) {
             this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
         }
 
-        if(this.headers['Content-Type'] === 'application/json') {
+        if (this.headers['Content-Type'] === 'application/json') {
             this.bodyText = JSON.stringify(this.body);
-        }else if(this.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
-            this.bodyText = Object.keys(this.body).map(key=>{
+        } else if (this.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+            this.bodyText = Object.keys(this.body).map(key => {
                 return `${key}=${encodeURIComponent(this.body[key])}`;
             }).join('&');
         }
@@ -28,9 +28,9 @@ class Request {
         this.headers['Content-length'] = this.bodyText.length;
     }
 
-    toString(){
+    toString() {
         return `${this.method} ${this.path} HTTP/1.1\r
-${Object.keys(this.headers).map(key=>`${key}: ${this.headers[key]}`).join('\r\n')}\r
+${Object.keys(this.headers).map(key => `${key}: ${this.headers[key]}`).join('\r\n')}\r
 \r
 ${this.bodyText}`;
     }
@@ -38,9 +38,9 @@ ${this.bodyText}`;
     send(connection) {
         return new Promise((resolve, reject) => {
             let parser = new ResponseParser();
-            if(connection) {
+            if (connection) {
                 connection.write(this.toString());
-            }else {
+            } else {
                 connection = net.createConnection({
                     host: this.host,
                     port: this.port
@@ -49,10 +49,10 @@ ${this.bodyText}`;
                 });
             }
 
-            connection.on('data', data =>{
+            connection.on('data', data => {
                 parser.receive(data.toString());
 
-                if(parser.isFinished) {
+                if (parser.isFinished) {
                     resolve(parser.response);
                     connection.end();
                 }
@@ -82,5 +82,5 @@ void async function () {
 
     let response = await request.send();
     let dom = HtmlParser.parserHTML(response.body);
-    console.log(dom);
+    console.log(JSON.stringify(dom, null, '....'));
 }();

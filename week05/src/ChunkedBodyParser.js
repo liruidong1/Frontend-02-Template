@@ -5,21 +5,22 @@ class ChunkedBodyParser {
     isFinished = false;
     state = this.waitingLength;
 
-    constructor() {}
+    constructor() {
+    }
 
     parser(char) {
         this.state = this.state(char);
     }
 
-    waitingLength(char){
-        if(char === '\r') {
-            if(this.length === 0) {
+    waitingLength(char) {
+        if (char === '\r') {
+            if (this.length === 0) {
                 this.isFinished = true;
                 return this.end;
             }
 
             return this.waitingLengthEnd;
-        }else {
+        } else {
             this.length *= 16;
             this.length += parseInt(char, 16);
             return this.waitingLength;
@@ -27,9 +28,9 @@ class ChunkedBodyParser {
     }
 
     waitingLengthEnd(char) {
-        if(char === '\n') {
+        if (char === '\n') {
             return this.readingChunk;
-        }else {
+        } else {
             return this.waitingLengthEnd;
         }
     }
@@ -37,25 +38,25 @@ class ChunkedBodyParser {
     readingChunk(char) {
         this.content.push(char);
         this.length -= char.length;
-        if(this.length === 0) {
+        if (this.length === 0) {
             return this.waitingNewLine;
-        }else {
+        } else {
             return this.readingChunk;
         }
     }
 
-    waitingNewLine(char){
-        if(char === '\r') {
+    waitingNewLine(char) {
+        if (char === '\r') {
             return this.waitingNewLineEnd;
-        }else {
+        } else {
             return this.waitingNewLine;
         }
     }
 
     waitingNewLineEnd(char) {
-        if(char === '\n') {
+        if (char === '\n') {
             return this.waitingLength;
-        }else {
+        } else {
             return this.waitingNewLineEnd;
         }
     }

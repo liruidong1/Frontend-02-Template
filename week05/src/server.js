@@ -16,37 +16,29 @@ http.createServer((request, response) => {
     <meta charset="UTF-8"/>
     <title>Title</title>
     <style>
-        div{
-            background-color: aqua;
-        }
-        
-        body .a {
-            max-width: 100px;
-        }
-        
-        .body .a {
-            max-width: 200px;
-        }
-        
-        div.a.b {
+        #container{
+            width: 500px;
+            height: 300px;
             display: flex;
+            flex-wrap: wrap;
         }
         
-        
-        div#id.a.b{
-            display: inline-block;
+        #myid {
+            width: 200px;
         }
         
-        .a.b{
-            display: block;
+        .c1 {
+            width: 200px;
         }
+        
         
     </style>
 </head>
-<body class="body">
-    <div class="a b" id="id">
-        ssss
-        <div class="a">ddddd</div>
+<body>
+    <div id="container">
+        <div id="myid"></div>
+        <div class="c1"></div>
+        <div class="c1"></div>
     </div>
 </body>
 </html>

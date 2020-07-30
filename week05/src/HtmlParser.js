@@ -1,5 +1,6 @@
 const EOF = Symbol('EOF');
 const css = require('css');
+const layout = require('./layout');
 
 let currentToken = null;
 let currentAttribute = null;
@@ -45,13 +46,13 @@ function computeCss(element) {
         if (matched) {
             let sp = specificity(rule.selectors[0]);
             let computedStyle = element.computedStyle;
-            for(let declaration of rule.declarations) {
+            for (let declaration of rule.declarations) {
                 let {property, value} = declaration;
-                if(!computedStyle[property]) {
+                if (!computedStyle[property]) {
                     computedStyle[property] = {};
                 }
 
-                if(!computedStyle[property].specificity || specificityCompare(computedStyle[property].specificity, sp) < 0) {
+                if (!computedStyle[property].specificity || specificityCompare(computedStyle[property].specificity, sp) < 0) {
                     computedStyle[property].value = value;
                     computedStyle[property].specificity = sp;
                 }
@@ -68,15 +69,15 @@ function match(element, selector) {
 
     let match = /(?<tagName>(\w+)?)(?<id>(#\w+)?)(?<classNames>(.[\w.]+)?)/;
 
-    let matchResult =  selector.match(match);
+    let matchResult = selector.match(match);
 
     let {tagName, id, classNames} = matchResult.groups;
 
     let matched = true;
 
     if (id) {
-        let attr = element.attributes.filter(attr => attr.name === 'id' );
-        matched = matched && attr.length > 0 && attr[0].value === id.replace('#','');
+        let attr = element.attributes.filter(attr => attr.name === 'id');
+        matched = matched && attr.length > 0 && attr[0].value === id.replace('#', '');
     }
 
     if (tagName) {
@@ -85,15 +86,15 @@ function match(element, selector) {
 
     if (classNames) {
         classNames = classNames.split('.').filter(val => !!val);
-        let attr = element.attributes.filter(attr => attr.name === 'class' );
+        let attr = element.attributes.filter(attr => attr.name === 'class');
         let _classNames = attr.length > 0 ? attr[0].value.split(' ') : [];
-        if(_classNames.length < classNames.length) {
+        if (_classNames.length < classNames.length) {
             matched = false;
-        }else {
-            for(let className of classNames) {
-               if(className) {
-                   matched = matched && _classNames.indexOf(className) > -1;
-               }
+        } else {
+            for (let className of classNames) {
+                if (className) {
+                    matched = matched && _classNames.indexOf(className) > -1;
+                }
             }
         }
     }
@@ -102,25 +103,25 @@ function match(element, selector) {
 }
 
 //计算选择器优先级
-function specificity(selector){
-    let p = [0,0,0,0];
+function specificity(selector) {
+    let p = [0, 0, 0, 0];
     let selectorParts = selector.split(' ');
     let match = /(?<tagName>(\w+)?)(?<id>(#\w+)?)(?<classNames>(.[\w.]+)?)/;
 
-    for(let part of selectorParts) {
-        let matchResult =  part.match(match);
+    for (let part of selectorParts) {
+        let matchResult = part.match(match);
 
         let {tagName, id, classNames} = matchResult.groups;
 
-        if(tagName) {
+        if (tagName) {
             p[3] += 1;
         }
 
-        if(id) {
+        if (id) {
             p[1] += 1;
         }
 
-        if(classNames) {
+        if (classNames) {
             classNames = classNames.split('.').filter(val => !!val);
             p[2] += classNames.length;
         }
@@ -131,15 +132,15 @@ function specificity(selector){
 
 //选择器优先级比较
 function specificityCompare(sp1, sp2) {
-    if(sp1[0] - sp2[0]) {
+    if (sp1[0] - sp2[0]) {
         return sp1[0] - sp2[0]
     }
 
-    if(sp1[1] - sp2[1]) {
+    if (sp1[1] - sp2[1]) {
         return sp1[1] - sp2[1]
     }
 
-    if(sp1[2] - sp2[2]) {
+    if (sp1[2] - sp2[2]) {
         return sp1[2] - sp2[2]
     }
 
@@ -186,6 +187,7 @@ function emit(token) {
             if (token.tagName === 'style') {
                 addCSSRules(top.children[0].content);
             }
+            layout(top);
             stack.pop();
         }
         currentTextNode = null;

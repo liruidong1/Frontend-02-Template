@@ -20,15 +20,18 @@ http.createServer((request, response) => {
             width: 500px;
             height: 300px;
             display: flex;
-            flex-wrap: wrap;
+            background-color: rgb(0,255,255);
         }
         
         #myid {
             width: 200px;
+            height: 100px;
+            background-color: rgb(255,0,0);
         }
         
         .c1 {
-            width: 200px;
+            flex: 1;
+            background-color: rgb(0,255,0);
         }
         
         
@@ -37,7 +40,6 @@ http.createServer((request, response) => {
 <body>
     <div id="container">
         <div id="myid"></div>
-        <div class="c1"></div>
         <div class="c1"></div>
     </div>
 </body>

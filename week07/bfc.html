@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div>
+        <div class="title">1 浮动容器和文字容器未发生 BFC 合并</div>
+        <div style="float: right;height: 100px;width: 100px;background-color: aqua;margin: 10px;">hidden</div>
+        <div style="overflow: hidden;margin: 20px;">
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字end
+        </div>
+    </div>
+
+    <div>
+        <div class="title">2 浮动容器和文字容器发生了 BFC 合并，文字环绕排版</div>
+        <div style="float: right;height: 100px;width: 100px;background-color: aqua;margin: 10px;">visible</div>
+        <div style="overflow: visible;margin: 20px;">
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字
+            文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字end
+        </div>
+    </div>
+
+    <div style="color: white;text-align: center;">
+        <div class="title">3 容器B设置了'overflow: visible'，容器A和C发生了BFC合并</div>
+        <div style="width: 100px;height: 100px;background-color: brown;margin: 20px;">A</div>
+        <div style="overflow: visible;width: 1000px;margin-top: 30px;background-color: green;">
+            <div style="width: 100px;height: 100px;background-color: brown;margin: 20px;">C</div>
+            B
+        </div>
+    </div>
+
+    <div style="color: white;text-align: center;">
+        <div class="title">4 容器B设置了'overflow: hidden'，容器B内部创建了新的BFC</div>
+        <div style="width: 100px;height: 100px;background-color: brown;margin: 20px;">A</div>
+        <div style="overflow: hidden;width: 1000px;margin-top: 30px;background-color: green;">
+            <div style="width: 100px;height: 100px;background-color: brown;margin: 20px;">C</div>
+            B
+        </div>
+    </div>
+</body>
+<style>
+    .title{
+        padding: 10px 0;
+        color: brown;
+        text-align: left;
+    }
+</style>
+</html>

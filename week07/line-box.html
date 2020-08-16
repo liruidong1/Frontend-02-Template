@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div style="font-size: 50px;line-height: 100px;background-color: pink;">
+        <div class="line-outer align-top">
+            <div class="line"></div>
+        </div>
+        <div class="line-outer align-bottom">
+            <div class="line"></div>
+        </div>
+        <div class="line-outer align-middle">
+            <div class="line"></div>
+        </div>
+        <div class="line-outer align-baseline">
+            <div class="line"></div>
+        </div>
+        <div class="line-outer align-text-top">
+            <div class="line"></div>
+        </div>
+        <div class="line-outer align-text-bottom">
+            <div class="line"></div>
+        </div>
+        <span>Hello 中国</span>
+<!--        <div class="inline-block align-text-bottom"></div>-->
+        <div class="inline-block align-text-top">b<br/>c</div>
+        <div class="inline-block align-text-bottom">e<br/>f</div>
+    </div>
+</body>
+<style>
+    .line-outer{
+        overflow: visible;
+        display: inline-block;
+        width: 1px;
+        height: 1px;
+    }
+
+    .inline-block{
+        display: inline-block;
+        width: 100px;
+        height: 150px;
+        line-height: 70px;
+        background-color: aqua;
+    }
+
+    .align-top{
+        vertical-align: top;
+    }
+
+    .align-bottom{
+        vertical-align: bottom;
+    }
+
+    .align-middle{
+        vertical-align: middle;
+    }
+
+    .align-middle .line{
+        background-color: blueviolet;
+    }
+
+    .align-baseline{
+        vertical-align: baseline;
+    }
+
+    .align-text-top{
+        vertical-align: text-top;
+    }
+
+    .align-text-bottom{
+        vertical-align: text-bottom;
+    }
+
+    .line {
+        width: 1000px;
+        height: 1px;
+        background-color: red;
+        position: relative;
+        vertical-align: text-bottom;
+    }
+
+    .line::after {
+        position: absolute;
+        right: -50px;
+        font-size: 12px;
+        line-height: 1px;
+    }
+
+    .align-top .line::after {
+        content: 'top';
+    }
+
+    .align-bottom .line::after {
+        content: 'bottom';
+    }
+
+    .align-middle .line::after {
+        content: 'middle';
+    }
+
+    .align-baseline .line::after {
+        content: 'baseline';
+    }
+
+    .align-text-top .line::after {
+        content: 'text-top';
+    }
+
+    .align-text-bottom .line::after {
+        content: 'text-bottom';
+    }
+</style>
+</html>

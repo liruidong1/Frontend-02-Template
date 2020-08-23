@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+    <script>
+        function httpPromise(url){
+            return new Promise(function(resolve,reject){
+                let random = Math.random();
+                console.log('random：' + random);
+                if(random > 0.5) {
+                    setTimeout(()=>{
+                        resolve('success: ' + url)
+                    }, 1000)
+                }else{
+                    setTimeout(()=>{
+                        reject('failed: ' + url)
+                    }, 1000)
+                }
+
+            })
+        }
+
+        function* generator(){
+            try {
+                let res1 = yield httpPromise('res1');
+                console.log(res1);
+                let res2 = yield httpPromise('res2');
+                console.log(res2);
+                let res3 = yield httpPromise('res3');
+                console.log(res3);
+                let res4 = yield httpPromise('res4');
+                console.log(res4);
+            }catch (e){
+                console.log(e);
+            }
+
+        }
+
+        function runGenerator(gen) {
+            let it = gen(), ret;
+
+            // 创造一个立即执行的递归函数
+            (function iterate(val){
+                ret = it.next(val);
+                console.log('next arguments：');
+                if (!ret.done) {
+                    // 如果能拿到一个 promise 实例
+                    if ("then" in ret.value) {
+                        // 就在它的 then 方法里递归调用 iterate
+                        ret.value.then( iterate );
+                    }
+                }
+            })();
+        }
+
+        async function f(){
+            let res1 = await httpPromise('res1');
+            console.log(res1);
+            let res2 = await httpPromise('res2');
+            console.log(res2);
+            let res3 = await httpPromise('res3');
+            console.log(res3);
+            let res4 = await httpPromise('res4');
+            console.log(res4);
+        }
+
+        class MyPromise {
+            //记录异步任务成功的执行结果
+            value = null;
+            //记录当前状态
+            status = 'pending';
+            //记录失败的原因
+            reason = null;
+
+            onResolvedQueue = [];
+
+            onRejectedQueue = [];
+
+            constructor(executor) {
+
+                let self = this;
+
+                function resolve(value) {
+                    if(self.status !== 'pending') {
+                        return;
+                    }
+
+                    self.value = value;
+                    self.status = 'resolved';
+                    setTimeout(()=>{
+                        self.onResolvedQueue.forEach(callback => callback(self.value));
+                    })
+                }
+
+                function reject(reason) {
+                    if(self.status !== 'pending') {
+                        return;
+                    }
+
+                    self.reason = reason;
+                    self.status = 'rejected';
+                    setTimeout(()=>{
+                        self.onRejectedQueue.forEach(callback => callback(self.reason));
+                    })
+                }
+
+                executor(resolve, reject);
+            }
+
+            then(onResolved, onRejected) {
+                if (typeof onResolved !== 'function') {
+                    onResolved = function(x) {return x};
+                }
+                if (typeof onRejected !== 'function') {
+                    onRejected = function(e) {throw e};
+                }
+
+                let self = this;
+
+                if(self.status === 'resolved') {
+                    onResolved(self.value);
+                } else if(self.status === 'rejected') {
+                    onRejected(self.reason);
+                } else {
+                    self.onResolvedQueue.push(onResolved);
+                    self.onRejectedQueue.push(onRejected);
+                }
+            }
+        }
+
+        function httpMyPromise(url){
+            return new MyPromise((resolve,reject)=>{
+                let random = Math.random();
+                console.log('random：' + random);
+                if(random > 0.5) {
+                    setTimeout(()=>{
+                        resolve('success: ' + url)
+                    }, 1000)
+                }else{
+                    setTimeout(()=>{
+                        reject('failed: ' + url)
+                    }, 1000)
+                }
+
+            })
+        }
+
+        class CutePromise {
+
+            value = null;
+
+            reason = null;
+
+            status = 'pending'; //resolved rejected
+
+            onResolvedTasks = [];
+
+            onRejectedTasks = [];
+
+            constructor(executor) {
+
+                let resolve = (val) => {
+                    debugger;
+                    if(this.status !== 'pending') {
+                        return ;
+                    }
+
+                    this.value = val;
+                    this.status = 'resolved';
+
+                    setTimeout(()=>{
+                        this.onResolvedTasks.forEach(onResolved => onResolved(this.value));
+                    })
+                };
+
+
+                let reject = (reason) => {
+                    if(this.status !== 'pending') {
+                        return ;
+                    }
+
+                    this.reason = reason;
+                    this.status = 'rejected';
+
+                    setTimeout(()=>{
+                        this.onRejectedTasks.forEach(onRejected => onRejected(this.reason));
+                    })
+                }
+
+                executor(resolve, reject);
+            }
+
+            then(onResolved, onRejected){
+
+                if(typeof onResolved !== 'function') {
+                    onResolved = function (val) {return val};
+                }
+
+                if(typeof onRejected !== 'function') {
+                    onRejected = function (reason) {return reason};
+                }
+
+
+                if(this.status === 'resolved') {
+                    onResolved(this.value);
+                } else if (this.status === 'rejected') {
+                    onRejected(this.reason);
+                } else {
+                    this.onResolvedTasks.push(onResolved);
+                    this.onRejectedTasks.push(onRejected);
+                }
+
+            }
+        }
+
+        new CutePromise((resolve,reject)=>{
+            setTimeout(()=>{
+                reject('CutePromise');
+            },200)
+        }).then((value)=>{
+            console.log(value);
+        },(reason)=>{
+            console.log(reason);
+        })
+
+        //使用一个定时器，只执行最后一次
+        function debounce(fn, delay = 1000) {
+
+            let timer = null;
+
+            return function () {
+                let context = this; //保留上下文
+                let args = arguments;
+
+                if(timer) {
+                    clearTimeout(timer);
+                }
+
+                timer = setTimeout(()=>{
+                    fn.apply(context, args);
+                },delay);
+            }
+
+        }
+
+        //节流 一段时间内只执行一次
+        function throttle (fn, interval){
+            let last = 0;
+
+            return function () {
+                let context = this; //保留上下文
+                let args = arguments;
+
+                let now = new Date().getTime();
+                if(now - last > interval) {
+                    last = now;
+                    fn.apply(context, args);
+                }
+            }
+        }
+
+        function Dog(name) {
+            this.name = name;
+        }
+
+        var dog = new Dog('ssss');
+
+    </script>
+</html>

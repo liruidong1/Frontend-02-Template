@@ -117,8 +117,6 @@
     container.addEventListener('contextmenu', (e) => e.preventDefault());
 
     container.addEventListener('mousedown', (e) => {
-        console.log('e.button', e.button);
-
         if (e.button === 0) {
             mouseDown = true;
             isClear = false;
@@ -189,6 +187,7 @@
     }
 
     async function path(map, start, end) {
+        console.time();
         //F = G + H
         //G 表示起点到某个点 p 的距离，H表示 p点到终点的距离
         let _start = new Cell({G:0, H:0, ...start, pre: null, visited: true});
@@ -273,8 +272,7 @@
 
                 container.children[row].children[col].setAttribute('data-broken', 3);
 
-                console.log('path',path)
-
+                console.timeEnd();
                 return path;
             }
 

@@ -63,7 +63,6 @@
     container.addEventListener('contextmenu', (e)=>e.preventDefault());
 
     container.addEventListener('mousedown',(e)=>{
-        console.log('e.button', e.button);
 
         if(e.button === 0) {
             mouseDown = true;
@@ -144,9 +143,7 @@
             if(map[cell]) return;
 
             await sleep(5);
-            // console.log(row, col);
             container.children[row].children[col].setAttribute('data-broken', 2);
-            // container.children[row].children[col].style.backgroundColor = 'lightgreen';
 
             map[cell] = 2;
             queue.push({row,col});

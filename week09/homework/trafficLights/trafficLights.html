@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        .light {
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            background-color: darkgrey;
+            margin-bottom: 10px;
+        }
+
+        .light.red:not(.inactive){
+            background-color: red;
+        }
+
+        .light.green:not(.inactive){
+            background-color: green;
+        }
+
+        .light.yellow:not(.inactive){
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="light green" id="green"></div>
+    <div class="light yellow inactive" id="yellow"></div>
+    <div class="light red inactive" id="red"></div>
+</body>
+<script>
+    let green = document.getElementById('green');
+    let red = document.getElementById('red');
+    let yellow = document.getElementById('yellow');
+
+    function change() {
+        setTimeout(()=>{
+            green.classList.add('inactive');
+            yellow.classList.remove('inactive');
+
+            setTimeout(()=>{
+                yellow.classList.add('inactive');
+                red.classList.remove('inactive');
+
+                setTimeout(()=>{
+                    red.classList.add('inactive');
+                    green.classList.remove('inactive');
+                }, 5000)
+
+            }, 2000)
+        }, 10000)
+    }
+
+    change();
+</script>
+</html>

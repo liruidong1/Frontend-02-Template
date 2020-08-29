@@ -30,8 +30,8 @@
         isFinish = false;
 
         constructor(pattern = [
-            0, 0, 0,
-            0, 0, 0,
+            0, 2, 0,
+            0, 1, 0,
             0, 0, 0], color = 1) {
             this.pattern = pattern;
             this.color = color;
@@ -84,6 +84,7 @@
             this.color = 3 - this.color;
 
             let choice = this.bestChoice(this.pattern, this.color);
+            console.log('choice: ', choice);
             if(choice.point){
                 let [row, col] = choice.point;
                 this.pattern[row*3+col] = this.color;
@@ -126,7 +127,6 @@
             if (this.willWin(this.pattern, this.color)) {
                 console.log(`${this.color === 1 ? 'O' : 'X'}将赢得本次对局`);
             }
-            console.log(this.bestChoice(this.pattern, this.color));
         }
 
         full() {
@@ -206,6 +206,7 @@
         }
 
         bestChoice(pattern, color) {
+
             if (pattern === this.pattern) {
                 pattern = JSON.parse(JSON.stringify(pattern));
             }
@@ -222,11 +223,13 @@
             outer: for (let row = 0; row < 3; row++) {
                 for (let col = 0; col < 3; col++) {
                     if (pattern[row * 3 + col] === 0) {
+                        console.log(`${color === 1 ? 'O' : 'X'}的最好策略`);
+                        console.log('尝试落子', {row, col});
                         pattern[row * 3 + col] = color;
-
+                        print(pattern);
                         //落子后查看对方最好策略
-                        let {result: _result} = this.bestChoice(pattern, 3 - color);
-
+                        let {result: _result, point: _point} = this.bestChoice(pattern, 3 - color);
+                        console.log('_result', _result, _point);
                         //此处复原变化
                         pattern[row * 3 + col] = 0;
 
@@ -252,7 +255,20 @@
         }
     }
 
+    function print(pattern) {
+        for (let row = 0; row < 3; row++) {
+            let str = '';
+            for (let col = 0; col < 3; col++){
+                let cell = pattern[row * 3 + col];
+                let char = cell === 1 ? ' O ' : cell === 2 ? ' X ' : ' - ';
+                str += '|'+char+'|';
+            }
+            console.log(str);
+        }
+
+        console.log('----------------------------------------')
+    }
+
     let ticTacToe = new TicTacToe().draw();
-    console.log(ticTacToe.bestChoice(ticTacToe.pattern, ticTacToe.color))
 </script>
 </html>

@@ -30,3 +30,7 @@
      
 
 ## 2 组件生命周期的定义
+
+## 3 拖拽事件的定义
+- 使用鼠标事件模拟拖拽，`mousedown`、`mousemove`、`mouseup`
+- 在document上去监听`mousemove`和`mouseup`事件，防止拖拽过快导致拖拽卡顿

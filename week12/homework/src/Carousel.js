@@ -103,7 +103,7 @@ export default class Carousel extends Component {
                         //防止position设置为了错误的值
                         position = (position + this.root.children.length) % this.root.children.length;
 
-                        // let next = -Math.sign(Math.round(x / width) - x + Math.round(width/2) * Math.sign(x));
+                        // 确认移动是否超过一半
                         let next = Math.abs(x % width) > (width / 2) ? Math.sign(x) : -Math.sign(x);
 
                         for (let offset of [0, next]) {

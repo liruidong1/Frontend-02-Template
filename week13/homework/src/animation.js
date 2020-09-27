@@ -4,15 +4,26 @@ const ANIMATIONS = Symbol('animations');
 const START_TIME = Symbol('start-time');
 const PAUSE_START = Symbol('pause-start');
 const PAUSE_TIME = Symbol('pause-time');
+const ANIMATION_STATUS = Symbol('animation-status');
+
+const ANIMATION_STATUS_DIC = {
+   INITED: Symbol('inited'),
+   STARTED: Symbol('started'),
+   PAUSED: Symbol('paused'),
+}
 
 export class Timeline {
 
    constructor() {
       this[ANIMATIONS] = new Set();
       this[START_TIME] = new Map();
+
+      this[ANIMATION_STATUS] = ANIMATION_STATUS_DIC.INITED;
    }
 
    start(){
+      if(this[ANIMATION_STATUS] !== ANIMATION_STATUS_DIC.INITED) return;
+      this[ANIMATION_STATUS] = ANIMATION_STATUS_DIC.STARTED;
       let startTime = Date.now();
       this[PAUSE_TIME] = 0;
       this[TICK] = () => {
@@ -43,11 +54,15 @@ export class Timeline {
    }
 
    pause(){
+      if(this[ANIMATION_STATUS] !== ANIMATION_STATUS_DIC.STARTED) return;
+      this[ANIMATION_STATUS] = ANIMATION_STATUS_DIC.PAUSED;
       this[PAUSE_START] = Date.now();
       cancelAnimationFrame(this[TICK_HANDLER]);
    }
 
    resume(){
+      if(this[ANIMATION_STATUS] !== ANIMATION_STATUS_DIC.PAUSED) return;
+      this[ANIMATION_STATUS] = ANIMATION_STATUS_DIC.STARTED;
       this[PAUSE_TIME] += Date.now() - this[PAUSE_START];
       this[TICK]();
    }

@@ -1,48 +1,53 @@
-let currentToken = null;
-let currentAttribute = null;
-let currentTextNode = null;
-let stack;
-
+//利用Symbol的唯一性，用来结束文件
 const EOF = Symbol('EOF');
+
+let currentToken = null,
+    currentAttribute = null,
+    currentTextNode = null;
+
+let stack = [{
+    type: 'document',
+    children: []
+}];
 
 function emit(token) {
     let top = stack[stack.length - 1];
 
-    if (token.type === 'startTag') {
+    if (token.type == 'startTag') {
         let element = {
             type: 'element',
             children: [],
             attributes: []
-        }
+        };
 
         element.tagName = token.tagName;
 
-        for (let key in token) {
-            if (key !== 'type' && key !== 'tagName') {
+        for (let p in token) {
+            if (p != 'type' && p != 'tagName') {
                 element.attributes.push({
-                    name: key,
-                    value: token[key]
-                })
+                    name: p,
+                    value: token[p]
+                });
             }
         }
 
         top.children.push(element);
         element.parent = top;
 
-        if (!token.isSelfClosing) {
+        if (!token.isSelfClosing)
             stack.push(element);
-        }
 
         currentTextNode = null;
-    } else if (token.type === 'endTag') {
-        if (top.tagName !== token.tagName) {
-            throw new Error(token.tagName + " Tag start end doesn't match!");
+
+    } else if (token.type == 'endTag') {
+        if (top.tagName != token.tagName) {
+            // throw new Error('Tag start end doesn`t match!');
         } else {
             stack.pop();
         }
         currentTextNode = null;
-    } else if (token.type === 'text') {
-        if (!currentTextNode) {
+    } else if (token.type == 'text') {
+        if (currentTextNode == null) {
             currentTextNode = {
                 type: 'text',
                 content: ''
@@ -53,188 +58,215 @@ function emit(token) {
     }
 }
 
-function data(char) {
-    if (char === '<') {
+function _data(c) {
+    if (c == '<') {
         return tagOpen;
-    } else if (char === EOF) {
+    } else if (c == EOF) {
         emit({
-            type: 'EOF'
-        });
+            type: "EOF"
+        })
+        return;
     } else {
         emit({
-            type: 'text',
-            content: char
+            type: "text",
+            content: c
         })
-        return data;
+        return _data;
     }
 }
 
-function tagOpen(char) {
-    if (char === '/') {
+function tagOpen(c) {
+    if (c == "/") {
         return endTagOpen;
-    } else if (char.match('^[a-zA-Z]$')) {
+    } else if (c.match(/^[a-zA-Z]$/)) {
         currentToken = {
-            type: 'startTag',
+            type: "startTag",
             tagName: ''
         }
-        return tagName(char);
+        return tagName(c);
+    } else {
+        emit({
+            type: "text",
+            content: c
+        })
+        return _data;
     }
 }
 
-function endTagOpen(char) {
-    if (char.match('^[a-zA-Z]$')) {
+function endTagOpen(c) {
+    if (c.match(/^[a-zA-Z]$/)) {
         currentToken = {
             type: 'endTag',
-            tagName: ''
+            tagName: ""
         }
-        return tagName(char);
-    } else if (char === '>') {
+        return tagName(c);
+    } else if (c == '>') {
 
-    } else if (char === EOF) {
+    } else if (c == EOF) {
 
     } else {
+
     }
 }
 
-function tagName(char) {
-    if (char.match(/^[\r\t\f ]$/)) {
+function tagName(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
         return beforeAttributeName;
-    } else if (char === '/') {
+    } else if (c == '/') {
         return selfClosingStartTag;
-    } else if (char.match('^[a-zA-Z]$')) {
-        currentToken.tagName += char.toLowerCase();
+    } else if (c.match(/^[a-zA-Z]$/)) {
+        currentToken.tagName += c;
         return tagName;
-    } else if (char === '>') {
-        emit(currentToken);
-        return data;
+    } else if (c == ">") {
+        emit(currentToken)
+        return _data;
     } else {
         return tagName;
     }
 }
 
-//解析标签属性
-function beforeAttributeName(char) {
-    if (char.match(/^[\t\n\f ]$/)) {
+function beforeAttributeName(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
         return beforeAttributeName;
-    } else if (char === '/' || char === '>' || char === EOF) {
-        return afterAttributeName(char);
-    } else if (char === '=') {
-
+    } else if (c == '>' || c == '/' || c == EOF) {
+        return afterAttributeName(c);
+    } else if (c == '=') {
+        // return beforeAttributeName;
     } else {
         currentAttribute = {
-            name: '',
-            value: ''
+            name: "",
+            value: ""
         }
-        return attributeName(char);
+        return attributeName(c);
     }
 }
 
-function attributeName(char) {
-    if (char === "=") {
-        return beforeAttributeValue;
-    } else if (char.match(/^[\r\t\f ]$/) || char === '/' || char === '>' || char === EOF) {
+function attributeName(c) {
+    if (c.match(/^[\t\n\f ]$/) || c == '/' || c == '>' || c == EOF) {
         return afterAttributeName(c);
-    } else if (char === '\u0000') {
+    } else if (c == '=') {
+        return beforeAttributeValue;
+    } else if (c == '\u0000') {
 
-    } else if (char === '"' || char === "'" || char === '<') {
+    } else if (c == '\"' || c == "'" || c == "<") {
 
     } else {
-        currentAttribute.name += char;
+        currentAttribute.name += c;
         return attributeName;
     }
 }
 
-function afterAttributeName(char) {
-
-}
-
-function beforeAttributeValue(char) {
-    if (char.match(/^[\r\t\f ]$/) || char === '/' || char === '>' || char === EOF) {
+function beforeAttributeValue(c) {
+    if (c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
         return beforeAttributeValue;
-    } else if (char === '"') {
+    } else if (c == '\"') {
         return doubleQuotedAttributeValue;
-    } else if (char === "'") {
+    } else if (c == "\'") {
         return singleQuotedAttributeValue;
+    } else if (c == '>') {
+
     } else {
-        return unquotedAttributeValue(char);
+        return UnquotedAttributeValue(c);
     }
 }
 
-function afterQuotedAttributeValue(char) {
-    if (char.match(/^[\r\t\f ]$/)) {
-        return beforeAttributeName;
-    } else if (char === '/') {
-        return selfClosingStartTag;
-    } else if (char === '>') {
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        emit(currentToken);
-        return data;
-    } else if (char === EOF) {
-
-    } else {
-        currentAttribute.value += char;
-        return doubleQuotedAttributeValue;
-    }
-}
-
-function doubleQuotedAttributeValue(char) {
-    if (char === '"') {
+function doubleQuotedAttributeValue(c) {
+    if (c == "\"") {
         currentToken[currentAttribute.name] = currentAttribute.value;
         return afterQuotedAttributeValue;
-    } else if (char === '\u0000') {
+    } else if (c == "\u0000") {
 
-    } else if (char === EOF) {
+    } else if (c == EOF) {
 
     } else {
-        currentAttribute.value += char;
+        currentAttribute.value += c;
         return doubleQuotedAttributeValue;
     }
 }
 
-function singleQuotedAttributeValue(char) {
-    if (char === "'") {
+function singleQuotedAttributeValue(c) {
+    if (c == '\'') {
         currentToken[currentAttribute.name] = currentAttribute.value;
         return afterQuotedAttributeValue;
-    } else if (char === '\u0000') {
+    } else if (c == "\u0000") {
 
-    } else if (char === EOF) {
+    } else if (c == EOF) {
 
     } else {
-        currentAttribute.value += char;
-        return doubleQuotedAttributeValue;
+        currentAttribute.value += c;
+        return singleQuotedAttributeValue;
     }
 }
 
-function unquotedAttributeValue(char) {
-    if (char.match(/^[\r\t\f ]$/)) {
-        currentToken[currentAttribute.name] = currentAttribute.value;
+function afterQuotedAttributeValue(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
         return beforeAttributeName;
-    } else if (char === '/') {
-        currentToken[currentAttribute.name] = currentAttribute.value;
+    } else if (c == '/') {
         return selfClosingStartTag;
-    } else if (char === '>') {
+    } else if (c == '>') {
         currentToken[currentAttribute.name] = currentAttribute.value;
         emit(currentToken);
-        return data;
-    } else if (char === '\u0000') {
-
-    } else if (char === '"' || char === "'" || char === '<' || char === '=' || char === '`') {
-
-    } else if (char === EOF) {
+        return _data;
+    } else if (c == EOF) {
 
     } else {
-        currentAttribute.value += char;
-        return unquotedAttributeValue;
+        throw new Error('unexpected charater \"' + c + '\"');
     }
 }
 
-//属性处理结束
+function UnquotedAttributeValue(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        return beforeAttributeName;
+    } else if (c == '/') {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        return selfClosingStartTag;
+    } else if (c == '>') {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken);
+        return _data;
+    } else if (c == '\u0000') {
 
-function selfClosingStartTag(char) {
-    if (char === '>') {
+    } else if (c == "\"" || c == "'" || c == '<' || c == "=" || c == "`") {
+
+    } else if (c == EOF) {
+
+    } else {
+        currentAttribute.value += c;
+        return UnquotedAttributeValue
+    }
+}
+
+function afterAttributeName(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
+        return afterAttributeName;
+    } else if (c == '/') {
+        return selfClosingStartTag;
+    } else if (c == '=') {
+        return beforeAttributeValue;
+    } else if (c == '>') {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken);
+        return _data;
+    } else if (c == EOF) {
+
+    } else {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        currentAttribute = {
+            name: "",
+            value: ""
+        };
+        return attributeName(c);
+    }
+}
+
+function selfClosingStartTag(c) {
+    console.log(c)
+    if (c == '>') {
         currentToken.isSelfClosing = true;
-        return data;
-    } else if (char === EOF) {
+        emit(currentToken);
+        return _data;
+    } else if (c == 'EOF') {
 
     } else {
 
@@ -242,15 +274,17 @@ function selfClosingStartTag(char) {
 }
 
 export function parserHTML(html) {
-    let state = data;
-    for (let char of html) {
-        state = state(char);
-    }
-    state(EOF);
     currentToken = null;
     currentAttribute = null;
     currentTextNode = null;
-    let root = {type: 'document', children: []};
-    stack = [root];
-    return root
+    stack = [{
+        type: 'document',
+        children: []
+    }]
+    let state = _data;
+    for (let c of html) {
+        state = state(c);
+    }
+    state = state(EOF);
+    return stack[0];
 }

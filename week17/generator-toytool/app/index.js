@@ -58,6 +58,7 @@ module.exports = class extends Generator {
             this.templatePath('.nycrc'),
             this.destinationPath('.nycrc')
         );
+
         this.fs.copyTpl(
             this.templatePath('src/HelloWorld.vue'),
             this.destinationPath('src/HelloWorld.vue')
@@ -76,6 +77,11 @@ module.exports = class extends Generator {
         this.fs.copyTpl(
             this.templatePath('main.js'),
             this.destinationPath('src/main.js')
+        );
+
+        this.fs.copyTpl(
+            this.templatePath('test/sample-test.js'),
+            this.destinationPath('src/sample-test.js')
         );
     }
 

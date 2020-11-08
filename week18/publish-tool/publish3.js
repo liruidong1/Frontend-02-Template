@@ -31,12 +31,12 @@ function publish(token) {
       level: 9
     },
   })
-  archive.directory('./sample/', false);
-  archive.finalize();
-  request.pipe(request)
+  archive.directory('./sample', false)
+  archive.finalize()
+  archive.pipe(request)
 
-  request.on('end', () => {
-    console.log('Success End ')
-  })
+  // request.on('end', () => {
+  //   console.log('Success End!')
+  // })
 
 }

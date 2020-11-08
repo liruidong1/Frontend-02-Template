@@ -1,6 +1,7 @@
 const http = require('http')
 const https = require('https')
 const unzipper = require('unzipper')
+// const fs = require('fs')
 const querystring = require('querystring')
 
 const clientId = 'Iv1.d6a0beeced783b01'
@@ -43,8 +44,10 @@ function publish(request, response) {
   getUser(query.token, info => {
     if (info.login === 'liruidong1') {
       request.pipe(unzipper.Extract({
-        path: '../server/public'
+        path: '../server/public/'
       }));
+      // let outFile = fs.createWriteStream('../server/public/index.zip')
+      // request.pipe(outFile)
       request.on('end', () => {
         response.end("Success!")
       })

@@ -45,7 +45,7 @@ const request = http.request({
     console.log(response)
 })
 
-const file = fs.createReadStream('./sample/sample.html')
+// const file = fs.createReadStream('./sample/sample.html')
 
 archive.directory('./sample', false)
 archive.finalize()

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "publish": "scp -P 8022 -r ./* huangke@127.0.0.1:/home/huangke/publish-server",
+    "publish": "scp -P 8022 -r ./* lrd@127.0.0.1:/home/lrd/publish-server",
     "start": "node ./server.js"
   },
   "keywords": [],

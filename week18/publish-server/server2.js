@@ -9,4 +9,6 @@ http.createServer(((request, response) => {
     // request.pipe(outFile)
 
     request.pipe(unzipper.Extract({ path: '../server/public/' }))
+
+
 })).listen(8082)

@@ -36,7 +36,7 @@ function publish(token) {
   })
   archive.directory('./sample/', false);
   archive.finalize();
-  archive.pipe(request)
+  request.pipe(request)
 
   request.on('end', () => {
     console.log('Success End ')

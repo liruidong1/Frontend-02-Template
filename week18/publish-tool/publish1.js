@@ -12,7 +12,7 @@ const request = http.request({
     console.log(response)
 })
 
-const file = fs.createReadStream('./src/sample.html')
+const file = fs.createReadStream('./sample/sample.html')
 
 file.on('data', chunk => {
     request.write(chunk)

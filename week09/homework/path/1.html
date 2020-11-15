@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        .row {
+            display: flex;
+        }
+
+        .row:not(:last-child)>.cell{
+            border-bottom-width: 0;
+        }
+
+        .cell{
+            width: 10px;
+            height: 10px;
+            border: 1px solid black;
+            background-color: black;
+        }
+
+        .cell:not(:last-child){
+            border-right-width: 0;
+        }
+
+        .cell[data-broken='0']{
+            background-color: #E3DEDE;
+        }
+
+        .cell[data-broken='1']{
+            background-color: black;
+        }
+
+    </style>
+</head>
+<body>
+    <div style="display: flex">
+        <div id="container"></div>
+        <div style="padding-left: 10px;">
+            <button onclick="save()">save</button>
+            <button onclick="clearMap()">clear</button>
+        </div>
+    </div>
+</body>
+<script>
+
+    let mouseDown = false;
+    let isClear = false;
+    let container = document.getElementById('container');
+
+    container.addEventListener('contextmenu', (e)=>e.preventDefault());
+
+    container.addEventListener('mousedown',(e)=>{
+
+        if(e.button === 0) {
+            mouseDown = true;
+            isClear = false;
+        }
+
+        if(e.button === 2) {
+            mouseDown = true;
+            isClear = true;
+        }
+    })
+
+    container.addEventListener('mouseup', ()=>{
+        mouseDown = false;
+        isClear = false;
+    })
+
+
+    function draw(){
+        let map = localStorage.getItem('map') ? JSON.parse(localStorage.getItem('map')) : Array(10000).fill(0);
+
+        let fragment = document.createDocumentFragment();
+        for(let row = 0; row < 100; row++){
+            let rowContainer = document.createElement('div');
+            rowContainer.classList.add('row')
+            for(let col = 0; col < 100; col++){
+                let cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.setAttribute('data-broken', map[row*100 + col]);
+
+                cell.addEventListener('mousemove', function (){
+                    if(mouseDown) {
+                        let val = isClear ? 0 : 1;
+                        map[row*100 + col] = val;
+                        this.setAttribute('data-broken', val);
+                    }
+                })
+
+                rowContainer.append(cell);
+            }
+
+            fragment.append(rowContainer);
+        }
+
+        container.innerHTML = '';
+        container.append(fragment)
+        return map;
+    }
+
+    let map = draw();
+
+    function save(){
+        localStorage.setItem('map', JSON.stringify(map));
+    }
+
+    function clearMap(){
+        localStorage.setItem('map', JSON.stringify(Array(10000).fill(0)));
+        map = draw();
+    }
+</script>
+</html>

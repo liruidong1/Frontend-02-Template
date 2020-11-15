@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        .light {
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            background-color: darkgrey;
+            margin-bottom: 10px;
+        }
+
+        .light.red:not(.inactive){
+            background-color: red;
+        }
+
+        .light.green:not(.inactive){
+            background-color: green;
+        }
+
+        .light.yellow:not(.inactive){
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="light green" id="green"></div>
+    <div class="light yellow inactive" id="yellow"></div>
+    <div class="light red inactive" id="red"></div>
+</body>
+<script>
+    let green = document.getElementById('green');
+    let red = document.getElementById('red');
+    let yellow = document.getElementById('yellow');
+
+    function toYellow(){
+        green.classList.add('inactive');
+        yellow.classList.remove('inactive');
+    }
+
+    function toRed(){
+        yellow.classList.add('inactive');
+        red.classList.remove('inactive');
+    }
+
+    function toGreen(){
+        red.classList.add('inactive');
+        green.classList.remove('inactive');
+    }
+
+    function timeout(time) {
+        return new Promise(resolve => {
+            setTimeout(resolve, time);
+        })
+    }
+
+   function* change() {
+        while (true) {
+            toGreen();
+            yield timeout(2000);
+            toYellow();
+            yield timeout(1000);
+            toRed();
+            yield timeout(1500);
+        }
+    }
+
+    function run(iterator) {
+        let {value, done} = iterator.next();
+
+        if(!done && typeof value.then === 'function') {
+            value.then(()=>{
+                run(iterator);
+            })
+        }
+    }
+
+    function co(generator) {
+        return function (){
+            return run(generator());
+        }
+    }
+
+    change = co(change);
+
+    change();
+</script>
+</html>

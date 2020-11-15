@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: green;
+            display: inline-block;
+            border: 1px solid white;
+            vertical-align: middle;
+
+            line-height: 100px;
+            font-size: 50px;
+            text-align: center;
+
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div id="board"></div>
+</body>
+<script>
+    class TicTacToe {
+
+        isFull = false;
+        isFinish = false;
+
+        constructor(pattern = [
+            0, 2, 0,
+            0, 1, 0,
+            0, 0, 0], color = 1) {
+            this.pattern = pattern;
+            this.color = color;
+        }
+
+        draw() {
+            let board = document.getElementById('board');
+            board.innerHTML = '';
+
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    let val = this.pattern[row * 3 + col];
+                    let cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.innerText = val === 2 ? 'X' :
+                        val === 1 ? 'O' : '';
+                    board.append(cell);
+                    cell.addEventListener('click', () => this.autoMove(row, col));
+                }
+                board.append(document.createElement('br'));
+            }
+
+            return this;
+        }
+
+        autoMove(row, col) {
+            if (this.isFinish) {
+                alert(`${this.color === 2 ? 'X' : 'O'}赢了`);
+                return;
+            }
+
+            if (this.isFull) {
+                alert(`和棋了`);
+                return;
+            }
+
+            this.pattern[row * 3 + col] = this.color;
+            this.draw();
+
+            if (this.full()) {
+                this.isFull = true;
+            }
+
+            if (this.isWin(this.pattern, this.color)) {
+                alert(`${this.color === 2 ? 'X' : 'O'}赢了`);
+                this.isFinish = true;
+                return;
+            }
+
+            this.color = 3 - this.color;
+
+            let choice = this.bestChoice(this.pattern, this.color);
+            console.log('choice: ', choice);
+            if(choice.point){
+                let [row, col] = choice.point;
+                this.pattern[row*3+col] = this.color;
+                this.draw();
+
+                if(this.isWin(this.pattern, this.color)) {
+                    alert(`${this.color === 2 ? 'X' : 'O'}赢了`);
+                    return;
+                }
+                this.color = 3 - this.color;
+            }
+        }
+
+        move(row, col) {
+            if (this.isFinish) {
+                alert(`${this.color === 2 ? 'X' : 'O'}赢了`);
+                return;
+            }
+
+            if (this.isFull) {
+                alert(`和棋了`);
+                return;
+            }
+
+            this.pattern[row * 3 + col] = this.color;
+            this.draw();
+
+            if (this.full()) {
+                this.isFull = true;
+            }
+
+            if (this.isWin(this.pattern, this.color)) {
+                alert(`${this.color === 2 ? 'X' : 'O'}赢了`);
+                this.isFinish = true;
+                return;
+            }
+
+            this.color = 3 - this.color;
+
+            if (this.willWin(this.pattern, this.color)) {
+                console.log(`${this.color === 1 ? 'O' : 'X'}将赢得本次对局`);
+            }
+        }
+
+        full() {
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    if(this.pattern[row * 3 + col] === 0) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        isWin(pattern, color) {
+            let isWin = true;
+            //判断行
+            for (let row = 0; row < 3; row++) {
+                isWin = true;
+                for (let col = 0; col < 3; col++) {
+                    if (pattern[row * 3 + col] !== color) {
+                        isWin = false;
+                    }
+                }
+
+                if (isWin) return true;
+            }
+
+            isWin = true;
+            //判断列
+            for (let col = 0; col < 3; col++) {
+                isWin = true;
+                for (let row = 0; row < 3; row++) {
+                    if (pattern[row * 3 + col] !== color) {
+                        isWin = false;
+                    }
+                }
+
+                if (isWin) return true;
+            }
+
+            isWin = true;
+            //col row 相等
+            for (let row = 0; row < 3; row++) {
+                if (pattern[row * 3 + row] !== color) {
+                    isWin = false;
+                }
+            }
+            if (isWin) return true;
+
+            isWin = true;
+            //col+row 相等
+            for (let row = 0; row < 3; row++) {
+                if (pattern[row * 2 + 2] !== color) {
+                    isWin = false;
+                }
+            }
+
+            return isWin;
+        }
+
+        willWin(pattern, color) {
+            pattern = JSON.parse(JSON.stringify(pattern));
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    if (pattern[row * 3 + col] === 0) {
+                        pattern[row * 3 + col] = color;
+                        if (this.isWin(pattern, color)) {
+                            return [row, col];
+                        }
+                        pattern[row * 3 + col] = 0;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        bestChoice(pattern, color) {
+
+            if (pattern === this.pattern) {
+                pattern = JSON.parse(JSON.stringify(pattern));
+            }
+            //选择一个最好的落点位置 优先级：1.自己赢 -> 2.别输
+            let point = null;
+            if ((point = this.willWin(pattern, color))) {
+                return {
+                    point,
+                    result: 1
+                }
+            }
+
+            let result = -2;  //result的值其实为 -1 0 1， -2相当于哨兵的特殊处理
+            outer: for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    if (pattern[row * 3 + col] === 0) {
+                        console.log(`${color === 1 ? 'O' : 'X'}的最好策略`);
+                        console.log('尝试落子', {row, col});
+                        pattern[row * 3 + col] = color;
+                        print(pattern);
+                        //落子后查看对方最好策略
+                        let {result: _result, point: _point} = this.bestChoice(pattern, 3 - color);
+                        console.log('_result', _result, _point);
+                        //此处复原变化
+                        pattern[row * 3 + col] = 0;
+
+                        //对方的最好策略 对应我方的最坏策略，所以可以比较对方的最坏策略是不是比我方现在的策略好
+                        if (-_result > result) {
+                            result = -_result;
+                            point = [row, col];
+
+                            if (result === 1) {
+                                break outer;
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            return {
+                point,
+                result: point ? result : 0
+            }
+
+        }
+    }
+
+    function print(pattern) {
+        for (let row = 0; row < 3; row++) {
+            let str = '';
+            for (let col = 0; col < 3; col++){
+                let cell = pattern[row * 3 + col];
+                let char = cell === 1 ? ' O ' : cell === 2 ? ' X ' : ' - ';
+                str += '|'+char+'|';
+            }
+            console.log(str);
+        }
+
+        console.log('----------------------------------------')
+    }
+
+    let ticTacToe = new TicTacToe().draw();
+</script>
+</html>

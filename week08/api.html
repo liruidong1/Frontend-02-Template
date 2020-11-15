@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    let names = Object.getOwnPropertyNames(window);
+
+    let errors = names.filter(name => {
+        return name.substr(name.length - 5, 5) === 'Error';
+    })
+
+    names = names.filter(name => {
+        return errors.indexOf(name) === -1;
+    })
+
+    let nodes = names.filter(name => {
+        return window[name] && (name === 'Node' || window[name].prototype instanceof Node);
+    })
+
+    names = names.filter(name => {
+        return nodes.indexOf(name) === -1;
+    })
+
+    let events = names.filter(name => {
+        return name.match(/^on/);
+    })
+
+    names = names.filter(name => {
+        return events.indexOf(name) === -1;
+    })
+
+    let webkit = names.filter(name => {
+        return name.match(/^webkit/);
+    })
+
+    names = names.filter(name => {
+        return webkit.indexOf(name) === -1;
+    })
+
+    let windows = names.filter(name => {
+        return window[name] === window;
+    })
+
+    names = names.filter(name => {
+        return windows.indexOf(name) === -1;
+    })
+
+    let windowApis = ['open', 'name', 'close', 'closed', 'stop',
+        'length',
+        'locationbar', 'menubar', 'personalbar', 'scrollbars', 'statusbar', 'toolbar']
+
+    names = names.filter(name => {
+        return windowApis.indexOf(name) === -1;
+    })
+
+    let ecma = ['Intl'];
+    names = names.filter(name => {
+        return ecma.indexOf(name) === -1;
+    })
+
+    let encoding = ['TextDecoder', 'TextEncoder', 'TextDecoderStream', 'TextEncoderStream'];
+
+    names = names.filter(name => {
+        return encoding.indexOf(name) === -1;
+    })
+
+    console.log(windows);
+    console.log(names);
+</script>
+</html>

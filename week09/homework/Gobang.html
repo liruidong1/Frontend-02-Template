@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gobang</title>
+    <style>
+
+        body{
+            display: flex;
+        }
+
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        .board{
+            border: 7px double #575656;
+        }
+
+        .row {
+            display: flex;
+        }
+
+        .row:not(:last-child)>.cell{
+            border-bottom-width: 0;
+        }
+
+        .cell{
+            width: 20px;
+            height: 20px;
+            border: 1px solid white;
+            background-color: #c79f9e;
+            position: relative;
+        }
+
+        .cell:not(:last-child){
+            border-right-width: 0;
+        }
+
+        .cell::before{
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            bottom: 2px;
+            left: 2px;
+            border-radius: 50%;
+            content: '';
+            background-color: transparent;
+        }
+
+        .cell[data-fill='1']::before{
+            background-color: white;
+        }
+
+        .cell[data-fill='2']::before{
+            background-color: black;
+        }
+
+    </style>
+</head>
+<body>
+<div id="board" class="board"></div>
+</body>
+<script>
+    class Gobang{
+
+        constructor(color = 1) {
+            this.pattern = localStorage.getItem('gobang') ? JSON.parse(localStorage.getItem('gobang')) : Array(15*15).fill(0);
+            this.color = color;
+            this.draw();
+            this.isFull = false;
+            this.isFinish = false;
+        }
+
+        draw(){
+            let board = document.getElementById('board');
+            let fragment = document.createDocumentFragment();
+
+            for(let row = 0; row < 15; row++) {
+                let rowContainer = document.createElement('div');
+                rowContainer.classList.add('row')
+                for(let col = 0; col < 15; col++) {
+                    let index = row * 15 + col;
+                    let cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.setAttribute('data-fill', this.pattern[index]);
+
+                    cell.addEventListener('click', () => {
+                        this.dropOff(row, col, cell);
+                    })
+
+                    rowContainer.append(cell);
+                }
+                fragment.append(rowContainer);
+            }
+            board.innerHTML = '';
+            board.append(fragment);
+        }
+
+        dropOff(row, col, cell) {
+            if(this.isFull) {
+                alert('已和棋！');
+                return;
+            }
+
+            if(this.isFinish) {
+                alert(`${this.color === 1 ? '白' : '黑'}棋赢了！`);
+                return;
+            }
+
+            let index = row * 15 + col;
+            if(!this.pattern[index]){
+                cell.setAttribute('data-fill', this.color);
+                this.pattern[index] = this.color;
+                if(this.isWin(this.pattern, this.color, row, col)) {
+                    this.isFinish = true;
+                    alert(`${this.color === 1 ? '白' : '黑'}棋赢了！`);
+                    return;
+                }
+                this.color = 3 - this.color;
+            }
+        }
+
+        isWin(pattern, color, row, col) {
+
+            let rows = {start: row - 4 < 0 ? 0 : row - 4, end: row + 4 > 14 ? 14 : row + 4};
+            let cols = {start: col - 4 < 0 ? 0 : col - 4, end: col + 4 > 14 ? 14 : col + 4};
+
+            let dirs = [
+                [[0,-1],[0,1]], //横向
+                [[-1,0],[1,0]], //纵向
+                [[-1,-1],[1,1]], //左斜 \
+                [[1,-1],[-1,1]] // 右斜 /
+            ];
+
+            let count = 1;
+            let flag = true;
+
+            let _row = row;
+            let _col = col;
+
+            for (let dir of dirs) {
+                count = 1;
+                for (let d of dir) {
+                    flag = true;
+
+                    while (flag) {
+                        _row += d[0];
+                        _col += d[1];
+
+                        if(_row >= rows.start && _row <= rows.end && _col >= cols.start && _col <= cols.end) {
+                            if(pattern[_row*15 + _col] === color) {
+                                count++;
+                            }else {
+                                flag = false;
+                            }
+                        }else {
+                            flag = false;
+                        }
+                    }
+
+                    _row = row;
+                    _col = col;
+                }
+
+                if(count >= 5) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    new Gobang();
+</script>
+</html>
